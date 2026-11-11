@@ -46,3 +46,36 @@ m_df.loc[:,'age'] = df['age'].fillna(np.median(m_df['age']))
 
 ## Mode
 m_df.loc[:,'age'] = m_df['age'].fillna(stats.mode(m_df['age'])[0][0])
+
+
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer, KNNImputer
+
+## Target - Purchases in the first six months
+
+r_df = df.copy()
+
+X_r = r_df[['age','days_on_platform','income']]
+y_r = r_df['lifetime_value']
+
+
+X_train_r = X_r[:4000]
+y_train_r = y_r[:4000]
+
+X_test_r = X_r[1000:]
+y_test_r = y_r[1000:]
+
+
+Imp = IterativeImputer(max_iter=10, random_state = 0)
+Imp.fit(X_train_r)
+
+X_train_r = Imp.transform(X_train_r)
+X_test_r = Imp.transform(X_test_r)
+
+X_train_r = pd.DataFrame(X_train_r)
+X_train_r.columns = X_train_r.columns
+
+X_test_r = pd.DataFrame(X_test_r)
+X_test_r.columns = X_test_r.columns
+
+r_df = pd.concat([X_train_r,X_test_r],axis = 0)
